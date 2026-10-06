@@ -1,3 +1,4 @@
+import iconv from "iconv-lite";
 import a from "../sentences/a.json";
 import b from "../sentences/b.json";
 import c from "../sentences/c.json";
@@ -37,6 +38,39 @@ const responseHeaders = {
 
 const CALLBACK_PATTERN = /^[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*$/;
 
+
+function normalizeCharset(charset) {
+    const normalized = (charset || "utf-8").trim().toLowerCase();
+
+    if (normalized === "gbk") {
+        return "gbk";
+    }
+
+    return "utf-8";
+}
+
+function encodeResponseBody(content, charset) {
+    if (charset === "gbk") {
+        return iconv.encode(content, "gbk");
+    }
+
+    return content;
+}
+
+function createEncodedResponse(content, contentType, charset = "utf-8", extraHeaders = {}, status = 200) {
+    const normalizedCharset = normalizeCharset(charset);
+    const charsetLabel = normalizedCharset === "gbk" ? "GBK" : "UTF-8";
+
+    return new Response(encodeResponseBody(content, normalizedCharset), {
+        status,
+        headers: {
+            "Content-Type": `${contentType}; charset=${charsetLabel}`,
+            ...extraHeaders,
+            ...responseHeaders,
+        },
+    });
+}
+
 function createResponse(code, message, extraData = {}, extraHeaders = {}) {
     return Response.json({
         code,
@@ -62,6 +96,10 @@ function handleError(code, error, devEnv, customMessage = "服务器内部错误
 
 function isValidPositiveInteger(value) {
     return Number.isInteger(value) && value > 0;
+}
+
+function isValidNonNegativeInteger(value) {
+    return Number.isInteger(value) && value >= 0;
 }
 
 function isValidCallbackName(callback) {
@@ -195,6 +233,7 @@ export async function onRequest(context) {
         const encodeType = url.searchParams.get("encode");
         const callback = url.searchParams.get("callback");
         const select = url.searchParams.get("select");
+        const charset = normalizeCharset(url.searchParams.get("charset"));
 
         const minLength = url.searchParams.has("min_length")
             ? Number.parseInt(url.searchParams.get("min_length"), 10)
@@ -203,8 +242,8 @@ export async function onRequest(context) {
             ? Number.parseInt(url.searchParams.get("max_length"), 10)
             : 30;
 
-        if (url.searchParams.has("min_length") && !isValidPositiveInteger(minLength)) {
-            return createResponse(400, "min_length 必须是正整数");
+        if (url.searchParams.has("min_length") && !isValidNonNegativeInteger(minLength)) {
+            return createResponse(400, "min_length 必须是非负整数");
         }
 
         if (url.searchParams.has("max_length") && !isValidPositiveInteger(maxLength)) {
@@ -217,6 +256,10 @@ export async function onRequest(context) {
 
         if (callback && !isValidCallbackName(callback)) {
             return createResponse(400, "callback 格式无效");
+        }
+
+        if (charset === "gbk" && callback) {
+            return createResponse(400, "GBK 字符集不支持与 callback 同时使用");
         }
 
         let sentences = getSentencesByCategory(categoryKey) || getRandomCategorySentences();
@@ -274,12 +317,7 @@ export async function onRequest(context) {
                 : randomSentence.hitokoto;
             const contentType = callback ? "application/javascript" : "text/plain";
 
-            return new Response(responseContent, {
-                headers: {
-                    "Content-Type": `${contentType}; charset=UTF-8`,
-                    ...responseHeaders,
-                },
-            });
+            return createEncodedResponse(responseContent, contentType, charset);
         }
 
         if (encodeType === "js") {
@@ -288,32 +326,17 @@ export async function onRequest(context) {
                 ? `;${callback}(${JSON.stringify(jsContent)});`
                 : jsContent;
 
-            return new Response(finalContent, {
-                headers: {
-                    "Content-Type": "application/javascript; charset=UTF-8",
-                    ...responseHeaders,
-                },
-            });
+            return createEncodedResponse(finalContent, "application/javascript", charset);
         }
 
         if ((!encodeType || encodeType === "json") && callback) {
             const jsonResponse = JSON.stringify(response);
             const jsonCallbackContent = `;${callback}(${JSON.stringify(jsonResponse)});`;
 
-            return new Response(jsonCallbackContent, {
-                headers: {
-                    "Content-Type": "application/javascript; charset=UTF-8",
-                    ...responseHeaders,
-                },
-            });
+            return createEncodedResponse(jsonCallbackContent, "application/javascript", charset);
         }
 
-        return Response.json(response, {
-            headers: {
-                "Content-Type": "application/json; charset=UTF-8",
-                ...responseHeaders,
-            },
-        });
+        return createEncodedResponse(JSON.stringify(response), "application/json", charset);
     } catch (error) {
         console.error("Unexpected error:", error);
         return handleError(500, error, env.DEV_ENV);
