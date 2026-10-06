@@ -6,6 +6,22 @@
 2. 部署到 Cloudflare Pages，不需要设置框架、环境变量等。
 3. 部署成功后直接访问即可，使用方法请参考 [一言开发者中心](https://developer.hitokoto.cn/sentence/)。
 
+### SVG 动态卡片
+
+除了 JSON / Text / JS 外，也支持直接返回 SVG，可用于 GitHub Profile README 等只允许嵌入图片的场景：
+
+```text
+https://hitokoto-cloudflare.pages.dev/?encode=svg&max_length=28
+```
+
+例如：
+
+```markdown
+![随机一言](https://hitokoto-cloudflare.pages.dev/?encode=svg&max_length=28)
+```
+
+> 图片可能会被 GitHub 的图片代理缓存，因此“一言”会动态更新，但不保证每次刷新页面都立即变化。
+
 ## 待完成
 - [ ] 支持指定返回字符集
 - [x] 支持指定返回句子的长度筛选
