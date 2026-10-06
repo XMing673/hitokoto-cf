@@ -2,13 +2,13 @@
 使用 Cloudflare Pages 搭建的简洁、快速的一言（Hitokoto）API。
 
 ## 使用方法
-1. 分叉此存储库。
-2. 部署到 Cloudflare Pages。
-3. 在 **Build command（构建命令）** 中填写 `npm ci`，确保 `iconv-lite` 等依赖会在打包 Pages Functions 前安装。
-4. 将 **Compatibility Date（兼容性日期）** 设置为 `2026-08-04` 或更晚（例如 `2026-10-01`）；也可以显式添加 `nodejs_compat` 兼容性标志。
+1. 分叉此存储库并连接到 Cloudflare Pages。
+2. 将 **Build command（构建命令）** 设置为 `npm run build`。
+3. 不需要再在 Cloudflare 面板里单独配置 Node.js 兼容性：仓库中的 `wrangler.jsonc` 已固定 `compatibility_date = 2024-09-23` 并启用 `nodejs_compat`。
+4. Pages 会先自动安装 npm 依赖，再执行构建脚本生成 `dist/` 静态目录，同时打包根目录下的 Pages Functions。
 5. 部署成功后直接访问即可，使用方法请参考 [一言开发者中心](https://developer.hitokoto.cn/sentence/)。
 
-> 这里两项都需要：`npm ci` 负责安装 npm 依赖，Node.js compatibility 负责让 `iconv-lite` 使用的 `buffer` / `string_decoder` 等 Node API 能在 Pages Functions 中正常打包和运行。
+> `iconv-lite` 需要 Node.js 的 `buffer` / `string_decoder`。兼容配置写入 Wrangler 文件后，Functions 打包阶段也能读取到，而不是只依赖 Cloudflare 控制台中的运行时设置。
 
 ### SVG 动态卡片
 
