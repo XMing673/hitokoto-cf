@@ -3,8 +3,11 @@
 
 ## 使用方法
 1. 分叉此存储库。
-2. 部署到 Cloudflare Pages，不需要设置框架、环境变量等。
-3. 部署成功后直接访问即可，使用方法请参考 [一言开发者中心](https://developer.hitokoto.cn/sentence/)。
+2. 部署到 Cloudflare Pages。
+3. 在 **Build command（构建命令）** 中填写 `npm ci`，用于安装 Functions 所需依赖；无需额外设置框架或环境变量。
+4. 部署成功后直接访问即可，使用方法请参考 [一言开发者中心](https://developer.hitokoto.cn/sentence/)。
+
+> 如果项目中设置过 `SKIP_DEPENDENCY_INSTALL=1` / `true`，请移除该变量，否则 npm 依赖不会被安装。
 
 ### SVG 动态卡片
 
