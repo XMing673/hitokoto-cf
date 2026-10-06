@@ -21,10 +21,6 @@ https://hitokoto.xming.cloud/?encode=svg&max_length=28
 
 > 图片可能会被 GitHub 的图片代理缓存，因此“一言”会动态更新，但不保证每次刷新页面都立即变化。
 
-## 已支持
-
-- [x] 支持指定返回字符集（`utf-8` / `gbk`）
-- [x] 支持指定返回句子的长度筛选（`min_length` / `max_length`）
 
 ### 字符集
 
