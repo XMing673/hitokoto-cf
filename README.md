@@ -16,9 +16,8 @@ https://hitokoto.xming.cloud/?encode=svg&max_length=28
 
 例如：
 
-```markdown
 ![随机一言](https://hitokoto.xming.cloud/?encode=svg&max_length=28)
-```
+
 
 > 图片可能会被 GitHub 的图片代理缓存，因此“一言”会动态更新，但不保证每次刷新页面都立即变化。
 
