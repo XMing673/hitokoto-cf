@@ -3,11 +3,11 @@
 
 ## 使用方法
 1. 分叉此存储库。
-2. 部署到 Cloudflare Pages。
-3. 在 **Build command（构建命令）** 中填写 `npm ci`，用于安装 Functions 所需依赖；无需额外设置框架或环境变量。
+2. 部署到 Cloudflare Pages。Pages 会根据 `package-lock.json` 自动安装依赖，无需额外填写 Build command。
+3. 在 **Settings → Functions → Compatibility Flags** 中为 Production 和 Preview 启用 `nodejs_compat`；或将 Compatibility Date 更新到 `2026-08-04` 及以后。
 4. 部署成功后直接访问即可，使用方法请参考 [一言开发者中心](https://developer.hitokoto.cn/sentence/)。
 
-> 如果项目中设置过 `SKIP_DEPENDENCY_INSTALL=1` / `true`，请移除该变量，否则 npm 依赖不会被安装。
+> `iconv-lite` 依赖 Node.js 的 `buffer` / `string_decoder`，因此 Pages Functions 需要 Node.js compatibility。
 
 ### SVG 动态卡片
 
