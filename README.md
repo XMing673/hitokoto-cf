@@ -21,9 +21,29 @@ https://hitokoto.xming.cloud/?encode=svg&max_length=28
 
 > 图片可能会被 GitHub 的图片代理缓存，因此“一言”会动态更新，但不保证每次刷新页面都立即变化。
 
-## 待完成
-- [ ] 支持指定返回字符集
-- [x] 支持指定返回句子的长度筛选
+## 已支持
+
+- [x] 支持指定返回字符集（`utf-8` / `gbk`）
+- [x] 支持指定返回句子的长度筛选（`min_length` / `max_length`）
+
+### 字符集
+
+默认使用 UTF-8。传入 `charset=gbk` 时会实际以 GBK 字节编码返回，而不只是修改响应头：
+
+```text
+https://hitokoto.xming.cloud/?encode=text&charset=gbk
+```
+
+与一言 v1 接口保持一致，GBK 不支持与 `callback` 同时使用；其他未知的 `charset` 值按 UTF-8 处理。
+
+### 长度筛选
+
+```text
+https://hitokoto.xming.cloud/?min_length=10&max_length=20
+```
+
+- `min_length`：最小长度，默认 `0`，允许显式传入 `0`
+- `max_length`：最大长度，默认 `30`
 
 ## 声明
 本仓库存储的程序是一个语录 API，语录数据来源于仓库根目录中的 sentences 文件夹，该数据集基于 [hitokoto-osc/sentences-bundle](https://github.com/hitokoto-osc/sentences-bundle)。本仓库作者不对数据内容的准确性或完整性负责，也不为其提供任何形式的保证。
