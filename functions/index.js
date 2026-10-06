@@ -113,6 +113,54 @@ function escapeHtml(value) {
         .replaceAll(">", "&gt;");
 }
 
+function escapeXml(value) {
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&apos;");
+}
+
+function truncateText(value, maxLength = 28) {
+    const text = String(value || "");
+    return text.length > maxLength ? `${text.slice(0, maxLength - 1)}…` : text;
+}
+
+function buildSvgResponse(sentence) {
+    const quote = escapeXml(truncateText(sentence.hitokoto, 34));
+    const sourceParts = [];
+
+    if (sentence.from_who) {
+        sourceParts.push(sentence.from_who);
+    }
+
+    if (sentence.from) {
+        sourceParts.push(`《${sentence.from}》`);
+    }
+
+    const source = escapeXml(truncateText(
+        sourceParts.length ? `—— ${sourceParts.join(" ")}` : "—— 一言",
+        32,
+    ));
+
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="780" height="104" viewBox="0 0 780 104" role="img" aria-label="${quote}">
+<style>
+    .bg { fill: #ffffff; stroke: #d0d7de; }
+    .quote { fill: #1f2328; font: 600 18px -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif; }
+    .source { fill: #656d76; font: 13px -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif; }
+    @media (prefers-color-scheme: dark) {
+        .bg { fill: #0d1117; stroke: #30363d; }
+        .quote { fill: #f0f6fc; }
+        .source { fill: #8b949e; }
+    }
+</style>
+<rect class="bg" x="0.5" y="0.5" width="779" height="103" rx="12"/>
+<text class="quote" x="28" y="44">「${quote}」</text>
+<text class="source" x="752" y="76" text-anchor="end">${source}</text>
+</svg>`;
+}
+
 function buildBrowserPage(response) {
     const json = escapeHtml(JSON.stringify(response, null, 2));
 
@@ -205,6 +253,16 @@ export async function onRequest(context) {
             return new Response(buildBrowserPage(response), {
                 headers: {
                     "Content-Type": "text/html; charset=UTF-8",
+                    ...responseHeaders,
+                },
+            });
+        }
+
+        if (encodeType === "svg") {
+            return new Response(buildSvgResponse(randomSentence), {
+                headers: {
+                    "Content-Type": "image/svg+xml; charset=UTF-8",
+                    "Cache-Control": "no-cache, no-store, must-revalidate",
                     ...responseHeaders,
                 },
             });
