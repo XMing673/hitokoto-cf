@@ -3,8 +3,8 @@
 
 ## 使用方法
 1. 分叉此存储库并连接到 Cloudflare Pages。
-2. 将 **Build command（构建命令）** 设置为 `npm run build`。
-3. **⚠️ 本仓库为小明自用，Fork 使用前请注意修改 `functions/index.js` 中 `title` 和 `link rel="icon"` 两个字段的相关内容嗷！**
+2.  **⚠️ 本仓库为小明自用，Fork 使用前请注意修改 `functions/index.js` 中 `title` 和 `link rel="icon"` 两个字段的相关内容嗷！**
+3. 将 **Build command（构建命令）** 设置为 `npm run build`。
 4. Pages 会先自动安装 npm 依赖，再执行构建脚本生成 `dist/` 静态目录，同时打包根目录下的 Pages Functions。
 5. 部署成功后直接访问即可，使用方法请参考 [一言开发者中心](https://developer.hitokoto.cn/sentence/)。
 
